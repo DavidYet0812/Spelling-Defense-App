@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拼字防禦戰</title>
+    <link rel="stylesheet" href="style.css?v=8">
+</head>
+<body>
+    <div id="game-container">
+        <header id="status-bar">
+            <div class="hp-box">HP: <span id="hp-display">❤️❤️❤️</span></div>
+            <div class="status-center">
+                <button id="sound-toggle" class="icon-btn" title="音效開關">🔊</button>
+                <button id="music-toggle" class="icon-btn" title="背景音樂開關">🎵</button>
+            </div>
+            <div class="score-box">分數: <span id="score-display">0</span></div>
+        </header>
+
+        <div id="fever-bar-container">
+            <div id="fever-bar-fill"></div>
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- 首頁：模式選擇 -->
+            <div id="start-screen">
+                <h1>🧙‍♂️ 拼字防禦戰</h1>
+                <p style="color:#aaa; margin-bottom: 5px; font-size:0.9rem;">看中文，拼英文，守護城堡！</p>
+                <div class="mode-buttons">
+                    <button id="start-defense-btn" class="mode-btn">
+                        <span class="mode-icon">⚔️</span>
+                        <span class="mode-title">防禦模式</span>
+                        <span class="mode-desc">單字從天而降，限時拼出！</span>
+                    </button>
+                    <button id="start-practice-btn" class="mode-btn practice">
+                        <span class="mode-icon">📖</span>
+                        <span class="mode-title">練習模式</span>
+                        <span class="mode-desc">不限時，慢慢練拼字</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 防禦模式結束畫面 -->
+            <div id="game-over-screen" style="display: none;">
+                <h2>💀 遊戲結束</h2>
+                <p>最終分數: <span id="final-score">0</span></p>
+                <button id="restart-btn">🔄 再玩一次</button>
+                <button id="back-menu-btn" class="secondary-btn">🏠 回到主選單</button>
+            </div>
+
+            <!-- 練習模式結束/離開畫面 -->
+            <div id="practice-end-screen" style="display: none;">
+                <h2>📊 練習結果</h2>
+                <p>完成單字: <span id="practice-count">0</span> 個</p>
+                <p>正確率: <span id="practice-accuracy">0</span>%</p>
+                <button id="practice-restart-btn">📖 繼續練習</button>
+                <button id="practice-menu-btn" class="secondary-btn">🏠 回到主選單</button>
+            </div>
+        </div>
+
+        <div id="keyboard-container">
+        </div>
+    </div>
+
+    <script src="api.js?v=8"></script>
+    <script src="game.js?v=8"></script>
+</body>
+</html>
