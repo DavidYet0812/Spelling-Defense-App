@@ -1454,8 +1454,18 @@ function showDictionaryScreen() {
     let html = '';
     
     listData.forEach((v, idx) => {
-        // 考慮資料庫欄位名稱可能為大寫或小寫，或者使用陣列索引
-        const idValue = v.id || v.ID || v.Id || (idx + 1);
+        // 優化：有時資料庫的第一個欄位（ID）在表頭可能只標記為數字、或是空白名稱
+        // 這裡自動抓取物件中的第一個屬性，只要它不叫 word 也不叫 translation，就視作 ID
+        let idValue = v.id || v.ID || v.Id;
+        if (!idValue) {
+            const firstKey = Object.keys(v)[0];
+            if (firstKey && firstKey.toLowerCase() !== 'word' && firstKey.toLowerCase() !== 'translation') {
+                idValue = v[firstKey];
+            } else {
+                idValue = idx + 1;
+            }
+        }
+
         html += `<div class="dict-card">
             <span class="dict-id">#${idValue}</span>
             <span class="dict-word">${v.word}</span>
