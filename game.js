@@ -841,12 +841,15 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 
 // --- 3. 虛擬鍵盤生成 ---
+let isUpperCase = false;
+
 function initKeyboard() {
     const container = document.getElementById('keyboard-container');
+    container.innerHTML = '';
     const layout = [
         ['q','w','e','r','t','y','u','i','o','p'],
         ['a','s','d','f','g','h','j','k','l'],
-        ['z','x','c','v','b','n','m'],
+        ['⇧','z','x','c','v','b','n','m'],
         ['-',' ',"'"]
     ];
     
@@ -856,16 +859,43 @@ function initKeyboard() {
         row.forEach(key => {
             const btn = document.createElement('button');
             btn.className = 'key-btn';
-            btn.textContent = key === ' ' ? 'SPACE' : key;
-            if (key === ' ') {
-                btn.style.maxWidth = '150px';
-                btn.style.flex = '2';
-            }
-            btn.setAttribute('data-key', key);
             
-            // 觸控與點擊事件
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput(key); });
-            btn.addEventListener('mousedown', (e) => { e.preventDefault(); handleInput(key); });
+            if (key === '⇧') {
+                btn.id = 'shift-btn';
+                btn.textContent = '⇧';
+                // 觸控與點擊事件
+                const toggleShift = (e) => {
+                    e.preventDefault();
+                    isUpperCase = !isUpperCase;
+                    btn.classList.toggle('active-shift', isUpperCase);
+                    updateKeyboardCase();
+                };
+                btn.addEventListener('touchstart', toggleShift);
+                btn.addEventListener('mousedown', toggleShift);
+            } else {
+                btn.textContent = key === ' ' ? 'SPACE' : key;
+                if (key === ' ') {
+                    btn.style.maxWidth = '150px';
+                    btn.style.flex = '2';
+                }
+                btn.setAttribute('data-key', key);
+                
+                // 觸控與點擊事件
+                const triggerInput = (e) => { 
+                    e.preventDefault(); 
+                    const currentKey = btn.getAttribute('data-key');
+                    handleInput(currentKey); 
+                    
+                    // 輸入完自動變回小寫 (類似手機虛擬鍵盤自動降級體驗)
+                    if (isUpperCase) {
+                        isUpperCase = false;
+                        document.getElementById('shift-btn').classList.remove('active-shift');
+                        updateKeyboardCase();
+                    }
+                };
+                btn.addEventListener('touchstart', triggerInput);
+                btn.addEventListener('mousedown', triggerInput);
+            }
             
             rowDiv.appendChild(btn);
         });
@@ -879,16 +909,27 @@ function initKeyboard() {
             // 防止按下空白鍵捲動網頁
             if (e.key === ' ') e.preventDefault();
             
-            const keyStr = e.key.toLowerCase();
+            const keyStr = e.key; // 保留大小寫
             handleInput(keyStr);
             // 讓虛擬按鍵閃爍一下
             const btns = Array.from(document.querySelectorAll('.key-btn'));
-            const btn = btns.find(b => b.getAttribute('data-key') === keyStr);
-            if (btn) {
+            const btn = btns.find(b => b.getAttribute('data-key') === keyStr || b.getAttribute('data-key') === keyStr.toLowerCase());
+            if (btn && btn.id !== 'shift-btn') {
                 btn.classList.add('active');
                 setTimeout(() => btn.classList.remove('active'), 100);
             }
         }
+    });
+}
+
+function updateKeyboardCase() {
+    const btns = document.querySelectorAll('.key-btn');
+    btns.forEach(btn => {
+        if (btn.id === 'shift-btn' || btn.textContent === 'SPACE' || btn.textContent === '-' || btn.textContent === "'") return;
+        const key = btn.getAttribute('data-key').toLowerCase();
+        const displayKey = isUpperCase ? key.toUpperCase() : key;
+        btn.textContent = displayKey;
+        btn.setAttribute('data-key', displayKey);
     });
 }
 
@@ -1128,13 +1169,13 @@ function handleInput(letter) {
     let targetWord = gameState.activeWords.find(w => w.typedIndex > 0);
     
     if (!targetWord) {
-        const candidates = gameState.activeWords.filter(w => w.text[0].toLowerCase() === letter);
+        const candidates = gameState.activeWords.filter(w => w.text[0] === letter);
         if (candidates.length > 0) {
             targetWord = candidates.reduce((prev, current) => (prev.y > current.y) ? prev : current);
         }
     }
 
-    if (targetWord && targetWord.text[targetWord.typedIndex].toLowerCase() === letter) {
+    if (targetWord && targetWord.text[targetWord.typedIndex] === letter) {
         targetWord.typedIndex++;
         SFX.playType();
         wizard.setState('cast', 300);
@@ -1173,7 +1214,7 @@ function handlePracticeInput(letter) {
 
     practiceState.totalAttempts++;
 
-    if (word.text[word.typedIndex].toLowerCase() === letter) {
+    if (word.text[word.typedIndex] === letter) {
         // 拼對
         word.typedIndex++;
         practiceState.correctAttempts++;
