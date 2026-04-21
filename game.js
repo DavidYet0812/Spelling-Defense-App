@@ -1128,13 +1128,13 @@ function handleInput(letter) {
     let targetWord = gameState.activeWords.find(w => w.typedIndex > 0);
     
     if (!targetWord) {
-        const candidates = gameState.activeWords.filter(w => w.text[0] === letter);
+        const candidates = gameState.activeWords.filter(w => w.text[0].toLowerCase() === letter);
         if (candidates.length > 0) {
             targetWord = candidates.reduce((prev, current) => (prev.y > current.y) ? prev : current);
         }
     }
 
-    if (targetWord && targetWord.text[targetWord.typedIndex] === letter) {
+    if (targetWord && targetWord.text[targetWord.typedIndex].toLowerCase() === letter) {
         targetWord.typedIndex++;
         SFX.playType();
         wizard.setState('cast', 300);
@@ -1173,7 +1173,7 @@ function handlePracticeInput(letter) {
 
     practiceState.totalAttempts++;
 
-    if (word.text[word.typedIndex] === letter) {
+    if (word.text[word.typedIndex].toLowerCase() === letter) {
         // 拼對
         word.typedIndex++;
         practiceState.correctAttempts++;
