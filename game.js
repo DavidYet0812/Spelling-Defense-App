@@ -1220,6 +1220,7 @@ function hideAllScreens() {
     document.getElementById('practice-end-screen').style.display = 'none';
     document.getElementById('category-screen').style.display = 'none';
     document.getElementById('dictionary-screen').style.display = 'none';
+    document.getElementById('batch-screen').style.display = 'none';
 }
 
 function showMainMenu() {
@@ -1270,6 +1271,7 @@ function clearEffects() {
 
 let allVocabData = [];     // 從 API 取得的完整題庫
 let selectedCategory = null; // 目前選擇的分類（null = 全部）
+let selectedBatchRange = null; // 目前選擇的批次範圍 {start, end}
 let pendingMode = 'defense'; // 等待分類選擇的模式
 
 // --- 顯示分類選擇畫面 ---
@@ -1328,9 +1330,57 @@ async function showCategoryScreen(mode) {
             
             if (pendingMode === 'dictionary') {
                 showDictionaryScreen();
+            } else if (pendingMode === 'practice') {
+                showBatchScreen();
             } else {
+                selectedBatchRange = null;
                 startGame(pendingMode);
             }
+        });
+    });
+}
+
+// --- 顯示批次範圍選擇畫面 (練習模式專用) ---
+function showBatchScreen() {
+    hideAllScreens();
+    document.getElementById('batch-screen').style.display = 'flex';
+    
+    let listData = allVocabData;
+    if (selectedCategory) {
+        listData = allVocabData.filter(v => (v.category || '未分類') === selectedCategory);
+    }
+    if (listData.length === 0) listData = [...allVocabData];
+    
+    const listEl = document.getElementById('batch-list');
+    let html = '';
+    
+    const BATCH_SIZE = 10;
+    const totalBatches = Math.ceil(listData.length / BATCH_SIZE);
+
+    // 「全部」按鈕
+    html += `<button class="category-btn all-btn" data-start="0" data-end="${listData.length}">
+        <span class="category-name">📦 全部練習</span>
+        <span class="category-count">${listData.length} 個</span>
+    </button>`;
+
+    // 各批次按鈕
+    for (let i = 0; i < totalBatches; i++) {
+        const start = i * BATCH_SIZE;
+        const end = Math.min((i + 1) * BATCH_SIZE, listData.length);
+        html += `<button class="category-btn" data-start="${start}" data-end="${end}">
+            <span class="category-name">🔖 第 ${start + 1} ~ ${end} 題</span>
+            <span class="category-count">${end - start} 個</span>
+        </button>`;
+    }
+    
+    listEl.innerHTML = html;
+
+    listEl.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const start = parseInt(btn.getAttribute('data-start'));
+            const end = parseInt(btn.getAttribute('data-end'));
+            selectedBatchRange = { start, end };
+            startGame('practice');
         });
     });
 }
@@ -1384,6 +1434,11 @@ async function startGame(mode) {
         vocabList = [...allVocabData];
     }
 
+    // 處理批次範圍擷取
+    if (selectedBatchRange) {
+        vocabList = vocabList.slice(selectedBatchRange.start, selectedBatchRange.end);
+    }
+
     // 重置共用狀態
     gameState.score = 0;
     gameState.activeWords = [];
@@ -1430,6 +1485,9 @@ document.getElementById('start-dictionary-btn').addEventListener('click', () => 
 
 // 分類畫面返回
 document.getElementById('category-back-btn').addEventListener('click', showMainMenu);
+
+// 批次選擇畫面返回分類畫面
+document.getElementById('batch-back-btn').addEventListener('click', () => showCategoryScreen('practice'));
 
 // 單字圖鑑返回分類畫面
 document.getElementById('dictionary-back-btn').addEventListener('click', () => showCategoryScreen('dictionary'));

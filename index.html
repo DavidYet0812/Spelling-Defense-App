@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>拼字防禦戰</title>
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
     <div id="game-container">
@@ -57,6 +57,16 @@
                 <button id="category-back-btn" class="secondary-btn" style="margin-top: 14px;">⬅ 返回</button>
             </div>
 
+            <!-- 項次/批次選擇畫面 -->
+            <div id="batch-screen" style="display: none;">
+                <h2 id="batch-title">🔢 選擇範圍</h2>
+                <p style="color:#aaa; font-size:0.85rem; margin-bottom: 8px;">將單字依序分組，分批練習效果更好</p>
+                <div id="batch-list" class="category-list">
+                    <!-- 動態生成 -->
+                </div>
+                <button id="batch-back-btn" class="secondary-btn" style="margin-top: 14px;">⬅ 返回分類</button>
+            </div>
+
             <!-- 單字預覽畫面 (單字圖鑑) -->
             <div id="dictionary-screen" style="display: none;">
                 <h2 id="dictionary-title">👀 單字總覽</h2>
@@ -88,7 +98,7 @@
         </div>
     </div>
 
-    <script src="api.js?v=11"></script>
-    <script src="game.js?v=11"></script>
+    <script src="api.js?v=12"></script>
+    <script src="game.js?v=12"></script>
 </body>
 </html>
