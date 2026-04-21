@@ -108,12 +108,12 @@ canvas { display: block; width: 100%; height: 100%; }
 
 /* 模式選擇按鈕 */
 .mode-buttons {
-    display: flex; flex-direction: column; gap: 14px;
-    margin-top: 18px; width: 100%; max-width: 280px;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 10px; width: 100%; max-width: 280px;
 }
 .mode-btn {
     display: flex; flex-direction: column; align-items: center;
-    padding: 18px 20px !important; margin: 0 !important;
+    padding: 12px 16px !important; margin: 0 !important;
     border-radius: 16px !important;
     background: linear-gradient(135deg, #1a1a3e, #2a2a5e) !important;
     border: 1px solid rgba(108,77,196,0.3) !important;
@@ -266,7 +266,7 @@ button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn):active { t
 }
 .keyboard-row { display: flex; justify-content: center; gap: 4px; }
 .key-btn {
-    flex: 1; max-width: 42px; height: 46px;
+    flex: 1; max-width: 42px; height: 40px;
     background: linear-gradient(180deg, #2a2a3e, #1e1e30);
     color: #ddd; border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px; font-size: 1.1rem; font-weight: bold;
@@ -315,8 +315,8 @@ body.fever-mode .key-btn:active, body.fever-mode .key-btn.active {
         border-radius: 0 0 24px 24px;
     }
     .key-btn {
-        max-width: 54px; height: 54px;
-        font-size: 1.2rem; border-radius: 10px;
+        max-width: 54px; height: 46px;
+        font-size: 1.15rem; border-radius: 10px;
     }
     .keyboard-row { gap: 6px; }
 
@@ -347,8 +347,8 @@ body.fever-mode .key-btn:active, body.fever-mode .key-btn.active {
         gap: 8px;
     }
     .key-btn {
-        max-width: 48px; height: 52px;
-        font-size: 1.2rem; border-radius: 10px;
+        max-width: 48px; height: 44px;
+        font-size: 1.15rem; border-radius: 8px;
     }
     .key-btn:hover {
         background: linear-gradient(180deg, #35355a, #282844);
@@ -372,7 +372,7 @@ body.fever-mode .key-btn:active, body.fever-mode .key-btn.active {
     }
     #status-bar { border-radius: 28px 28px 0 0; }
     #keyboard-container { border-radius: 0 0 28px 28px; }
-    .key-btn { max-width: 52px; height: 56px; font-size: 1.25rem; }
+    .key-btn { max-width: 52px; height: 48px; font-size: 1.2rem; }
 }
 
 /* ======================================= */
