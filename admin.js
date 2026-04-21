@@ -128,3 +128,85 @@ uploadBtn.addEventListener('click', async () => {
         uploadBtn.innerText = "確認匯入無誤，開始上傳";
     }
 });
+
+// --- 4. 側邊欄導航與分頁切換 ---
+const navItems = {
+    dashboard: document.getElementById('nav-dashboard'),
+    vocab: document.getElementById('nav-vocab'),
+    leaderboard: document.getElementById('nav-leaderboard')
+};
+
+const sections = {
+    dashboard: document.getElementById('section-dashboard'),
+    vocab: document.getElementById('section-vocab'),
+    leaderboard: document.getElementById('section-leaderboard')
+};
+
+function switchTab(tabName) {
+    // 更新選單樣式
+    Object.values(navItems).forEach(nav => nav.classList.remove('active'));
+    Object.values(sections).forEach(sec => sec.classList.remove('active'));
+    
+    navItems[tabName].classList.add('active');
+    sections[tabName].classList.add('active');
+
+    // 載入對應資料
+    if (tabName === 'dashboard') loadDashboard();
+    if (tabName === 'leaderboard') loadLeaderboard();
+}
+
+navItems.dashboard.addEventListener('click', () => switchTab('dashboard'));
+navItems.vocab.addEventListener('click', () => switchTab('vocab'));
+navItems.leaderboard.addEventListener('click', () => switchTab('leaderboard'));
+
+// --- 5. 載入儀表板資料 ---
+async function loadDashboard() {
+    try {
+        const stats = await fetchStats(); // api.js 提供
+        document.getElementById('stat-vocab').innerText = stats.totalVocab;
+        document.getElementById('stat-category').innerText = stats.categories;
+        document.getElementById('stat-highest').innerText = stats.highestScore;
+        document.getElementById('stat-players').innerText = stats.totalPlayers;
+    } catch(e) {
+        console.error("Dashboard Error:", e);
+    }
+}
+
+// --- 6. 載入排行榜資料 ---
+async function loadLeaderboard() {
+    try {
+        const tbody = document.getElementById('leaderboard-tbody');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">資料載入中...</td></tr>';
+        
+        const list = await fetchLeaderboard(); // api.js 提供
+        
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">尚無排行榜資料</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        list.sort((a,b) => b.score - a.score).forEach((item, index) => {
+            let rankIcon = index + 1;
+            if(index === 0) rankIcon = '🥇 1';
+            if(index === 1) rankIcon = '🥈 2';
+            if(index === 2) rankIcon = '🥉 3';
+            
+            // 防禦模式打榜處理 (防呆確保資料結構正確)
+            const dateStr = item.date || new Date().toISOString().split('T')[0];
+            
+            html += `<tr>
+                <td><strong>${rankIcon}</strong></td>
+                <td>${item.name || '匿名玩家'}</td>
+                <td style="color:#28a745; font-weight:bold;">${item.score}</td>
+                <td style="color:#6c757d; font-size:0.9em;">${dateStr}</td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html;
+        
+    } catch(e) {
+        console.error("Leaderboard Error:", e);
+        document.getElementById('leaderboard-tbody').innerHTML = '<tr><td colspan="4" style="text-align: center; color:red;">伺服器連線失敗</td></tr>';
+    }
+}

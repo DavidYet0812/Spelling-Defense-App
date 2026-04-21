@@ -34,20 +34,46 @@
         th { background-color: #f1f3f5; color: #495057; }
         tr.error-row { background-color: #ffe5e5; }
         tr.error-row td { color: #d32f2f; }
+
+        /* 儀表板與排行榜專屬樣式 */
+        .section-panel { display: none; }
+        .section-panel.active { display: block; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .stat-box { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stat-box h3 { margin: 0; font-size: 1rem; color: #6c757d; }
+        .stat-box p { margin: 10px 0 0 0; font-size: 2rem; font-weight: bold; color: #343a40; }
+        
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .data-table th, .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .data-table th { background-color: #e9ecef; color: #495057; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h2>拼字防禦戰<br>教師控制中心</h2>
-        <div class="nav-item">儀表板總覽</div>
-        <div class="nav-item active">單字庫管理 (大量匯入)</div>
-        <div class="nav-item">排行榜紀錄</div>
+        <div class="nav-item" id="nav-dashboard">儀表板總覽</div>
+        <div class="nav-item active" id="nav-vocab">單字庫管理 (大量匯入)</div>
+        <div class="nav-item" id="nav-leaderboard">排行榜紀錄</div>
         <div class="nav-item" style="margin-top: auto;" onclick="window.location.href='index.html'">🔙 返回遊戲</div>
     </div>
 
     <div class="main-content">
-        <div class="card">
+        <!-- 儀表板總覽 -->
+        <div class="card section-panel" id="section-dashboard">
+            <h1>📊 儀表板總覽</h1>
+            <p style="color:#666;">即時掌握學習題庫與遊玩熱度統計資料。</p>
+            <div class="stats-grid">
+                <div class="stat-box"><h3>總單字數量</h3><p id="stat-vocab">...</p></div>
+                <div class="stat-box"><h3>現有分類數</h3><p id="stat-category">...</p></div>
+                <div class="stat-box"><h3>最高得分</h3><p id="stat-highest">...</p></div>
+                <div class="stat-box"><h3>排行榜筆數</h3><p id="stat-players">...</p></div>
+            </div>
+        </div>
+
+        <!-- 單字庫管理 -->
+        <div class="card section-panel active" id="section-vocab">
             <h1>新增單字題庫</h1>
             <p>請上傳包含 <code>英文單字,中文翻譯,分類(選填),難度(選填)</code> 格式的 CSV 檔案。系統會自動略過有缺漏的無效資料。</p>
             
@@ -62,6 +88,25 @@
                 <table id="previewTable">
                     </table>
             </div>
+        </div>
+
+        <!-- 排行榜紀錄 -->
+        <div class="card section-panel" id="section-leaderboard">
+            <h1>🏆 排行榜紀錄</h1>
+            <p style="color:#666;">防禦模式中玩家的最高分數成績單。</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">排名</th>
+                        <th>玩家名稱</th>
+                        <th>最高分數</th>
+                        <th>打榜日期</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-tbody">
+                    <tr><td colspan="4" style="text-align: center;">資料載入中...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
