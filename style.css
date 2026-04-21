@@ -83,7 +83,7 @@ canvas { display: block; width: 100%; height: 100%; }
 /* ===================== */
 /* 開始與結束覆蓋層        */
 /* ===================== */
-#start-screen, #game-over-screen, #practice-end-screen {
+#start-screen, #game-over-screen, #practice-end-screen, #category-screen, #dictionary-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: radial-gradient(ellipse at center, rgba(10,10,26,0.88) 0%, rgba(10,10,26,0.96) 100%);
     display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20;
@@ -93,7 +93,8 @@ canvas { display: block; width: 100%; height: 100%; }
 #start-screen h1 {
     font-size: 2.2rem; margin-bottom: 6px;
     background: linear-gradient(135deg, #ffcc00, #ff9f43);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-shadow: none;
 }
 #game-over-screen h2 { color: #e94560; font-size: 1.8rem; }
@@ -101,7 +102,8 @@ canvas { display: block; width: 100%; height: 100%; }
 #practice-end-screen h2 {
     font-size: 1.8rem;
     background: linear-gradient(135deg, #4CAF50, #00ff88);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* 模式選擇按鈕 */
@@ -133,6 +135,14 @@ canvas { display: block; width: 100%; height: 100%; }
     box-shadow: 0 8px 30px rgba(76,175,80,0.3) !important;
     border-color: rgba(76,175,80,0.6) !important;
 }
+.mode-btn.dictionary {
+    background: linear-gradient(135deg, #1a2a3e, #1e3e4a) !important;
+    border-color: rgba(0, 188, 212, 0.3) !important;
+}
+.mode-btn.dictionary:hover {
+    box-shadow: 0 8px 30px rgba(0, 188, 212, 0.3) !important;
+    border-color: rgba(0, 188, 212, 0.6) !important;
+}
 .mode-icon { font-size: 1.8rem; margin-bottom: 4px; }
 .mode-title {
     font-size: 1.2rem; font-weight: bold; color: #fff;
@@ -140,8 +150,88 @@ canvas { display: block; width: 100%; height: 100%; }
 }
 .mode-desc { font-size: 0.8rem; color: #aaa; margin-top: 2px; }
 
+/* 分類選擇清單 */
+#category-screen h2 {
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #7B68EE, #a78bfa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.category-list {
+    display: flex; flex-direction: column; gap: 8px;
+    width: 100%; max-width: 300px;
+    max-height: 55vh; overflow-y: auto;
+    padding: 4px 2px;
+    margin-top: 10px;
+}
+.category-list::-webkit-scrollbar { width: 4px; }
+.category-list::-webkit-scrollbar-track { background: transparent; }
+.category-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+.category-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px !important; margin: 0 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #1a1a3e, #22224a) !important;
+    border: 1px solid rgba(123,104,238,0.2) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+    cursor: pointer; transition: all 0.2s !important;
+    text-align: left;
+}
+.category-btn:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(123,104,238,0.5) !important;
+    box-shadow: 0 4px 20px rgba(123,104,238,0.2) !important;
+}
+.category-btn:active { transform: scale(0.97) !important; }
+.category-btn.all-btn {
+    background: linear-gradient(135deg, #2a1a4e, #3a2a6e) !important;
+    border-color: rgba(167,139,250,0.4) !important;
+}
+.category-name {
+    font-size: 1.05rem; font-weight: bold; color: #fff;
+    letter-spacing: 1px;
+}
+.category-count {
+    font-size: 0.8rem; color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.06);
+    padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* 單字圖鑑清單 */
+#dictionary-screen h2 {
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #00BCD4, #80DEEA);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.dictionary-list {
+    display: flex; flex-direction: column; gap: 8px;
+    width: 100%; max-width: 320px;
+    max-height: 60vh; overflow-y: auto;
+    padding: 6px;
+    margin-top: 10px;
+}
+.dictionary-list::-webkit-scrollbar { width: 4px; }
+.dictionary-list::-webkit-scrollbar-track { background: transparent; }
+.dictionary-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+.dict-card {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.dict-word {
+    font-size: 1.2rem; font-weight: bold; color: #ffcc00;
+    font-family: 'Courier New', monospace; letter-spacing: 1px;
+}
+.dict-trans {
+    font-size: 1rem; color: #fff;
+}
+
 /* 通用遊戲按鈕 */
-button:not(.icon-btn):not(.mode-btn):not(.key-btn) {
+button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn) {
     padding: 15px 40px; font-size: 1.1rem;
     background: linear-gradient(135deg, #4a3fa0, #6c4dc4);
     color: white; border: none; border-radius: 12px;
@@ -150,8 +240,8 @@ button:not(.icon-btn):not(.mode-btn):not(.key-btn) {
     transition: transform 0.15s, box-shadow 0.15s;
     letter-spacing: 1px; font-weight: bold;
 }
-button:not(.icon-btn):not(.mode-btn):not(.key-btn):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 77, 196, 0.6); }
-button:not(.icon-btn):not(.mode-btn):not(.key-btn):active { transform: scale(0.96); }
+button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 77, 196, 0.6); }
+button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn):active { transform: scale(0.96); }
 
 /* 次要按鈕（回主選單等） */
 .secondary-btn {
@@ -231,7 +321,7 @@ body.fever-mode .key-btn:active, body.fever-mode .key-btn.active {
     .keyboard-row { gap: 6px; }
 
     #start-screen h1 { font-size: 2.6rem; }
-    button:not(.icon-btn) { padding: 18px 50px; font-size: 1.15rem; }
+    button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn) { padding: 18px 50px; font-size: 1.15rem; }
 }
 
 /* ======================================= */
@@ -268,7 +358,7 @@ body.fever-mode .key-btn:active, body.fever-mode .key-btn.active {
 
     #start-screen h1 { font-size: 2.8rem; }
     #start-screen p { font-size: 1rem !important; }
-    button:not(.icon-btn) { padding: 18px 55px; font-size: 1.2rem; border-radius: 14px; }
+    button:not(.icon-btn):not(.mode-btn):not(.key-btn):not(.category-btn) { padding: 18px 55px; font-size: 1.2rem; border-radius: 14px; }
 }
 
 /* ======================================= */

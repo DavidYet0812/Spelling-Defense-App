@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>拼字防禦戰</title>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
     <div id="game-container">
@@ -39,7 +39,31 @@
                         <span class="mode-title">練習模式</span>
                         <span class="mode-desc">不限時，慢慢練拼字</span>
                     </button>
+                    <button id="start-dictionary-btn" class="mode-btn dictionary">
+                        <span class="mode-icon">👀</span>
+                        <span class="mode-title">觀看單字庫</span>
+                        <span class="mode-desc">先背單字，再開始遊戲</span>
+                    </button>
                 </div>
+            </div>
+
+            <!-- 分類選擇畫面 -->
+            <div id="category-screen" style="display: none;">
+                <h2 id="category-title">📚 選擇題庫</h2>
+                <p style="color:#aaa; font-size:0.85rem; margin-bottom: 8px;">選擇要練習的單字分類</p>
+                <div id="category-list" class="category-list">
+                    <!-- 動態生成 -->
+                </div>
+                <button id="category-back-btn" class="secondary-btn" style="margin-top: 14px;">⬅ 返回</button>
+            </div>
+
+            <!-- 單字預覽畫面 (單字圖鑑) -->
+            <div id="dictionary-screen" style="display: none;">
+                <h2 id="dictionary-title">👀 單字總覽</h2>
+                <div id="dictionary-list" class="dictionary-list">
+                    <!-- 動態生成 -->
+                </div>
+                <button id="dictionary-back-btn" class="secondary-btn" style="margin-top: 14px;">⬅ 返回分類</button>
             </div>
 
             <!-- 防禦模式結束畫面 -->
@@ -50,7 +74,7 @@
                 <button id="back-menu-btn" class="secondary-btn">🏠 回到主選單</button>
             </div>
 
-            <!-- 練習模式結束/離開畫面 -->
+            <!-- 練習模式結束畫面 -->
             <div id="practice-end-screen" style="display: none;">
                 <h2>📊 練習結果</h2>
                 <p>完成單字: <span id="practice-count">0</span> 個</p>
@@ -64,7 +88,7 @@
         </div>
     </div>
 
-    <script src="api.js?v=8"></script>
-    <script src="game.js?v=8"></script>
+    <script src="api.js?v=11"></script>
+    <script src="game.js?v=11"></script>
 </body>
 </html>

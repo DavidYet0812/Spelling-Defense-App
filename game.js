@@ -1218,6 +1218,8 @@ function hideAllScreens() {
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-over-screen').style.display = 'none';
     document.getElementById('practice-end-screen').style.display = 'none';
+    document.getElementById('category-screen').style.display = 'none';
+    document.getElementById('dictionary-screen').style.display = 'none';
 }
 
 function showMainMenu() {
@@ -1266,15 +1268,121 @@ function clearEffects() {
     screenFlash = 0;
 }
 
+let allVocabData = [];     // 從 API 取得的完整題庫
+let selectedCategory = null; // 目前選擇的分類（null = 全部）
+let pendingMode = 'defense'; // 等待分類選擇的模式
+
+// --- 顯示分類選擇畫面 ---
+async function showCategoryScreen(mode) {
+    pendingMode = mode;
+    SFX.init();
+
+    // 先取得完整題庫
+    hideAllScreens();
+    document.getElementById('category-screen').style.display = 'flex';
+    
+    let titleStr = '📚 選擇題庫';
+    if (mode === 'practice') titleStr = '📖 選擇練習題庫';
+    if (mode === 'defense') titleStr = '⚔️ 選擇對戰題庫';
+    if (mode === 'dictionary') titleStr = '👀 選擇預覽題庫';
+    document.getElementById('category-title').textContent = titleStr;
+
+    const listEl = document.getElementById('category-list');
+    listEl.innerHTML = '<p style="color:#888; font-size:0.9rem;">⏳ 載入題庫中...</p>';
+
+    allVocabData = await fetchVocab();
+
+    // 提取所有分類並統計數量
+    const categoryMap = {};
+    allVocabData.forEach(v => {
+        const cat = v.category || '未分類';
+        categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+    });
+
+    const categories = Object.keys(categoryMap);
+
+    // 生成按鈕
+    let html = '';
+
+    // 「全部」按鈕
+    html += `<button class="category-btn all-btn" data-category="__all__">
+        <span class="category-name">📦 全部單字</span>
+        <span class="category-count">${allVocabData.length} 個</span>
+    </button>`;
+
+    // 各分類按鈕
+    categories.sort().forEach(cat => {
+        html += `<button class="category-btn" data-category="${cat}">
+            <span class="category-name">📁 ${cat}</span>
+            <span class="category-count">${categoryMap[cat]} 個</span>
+        </button>`;
+    });
+
+    listEl.innerHTML = html;
+
+    // 綁定點擊事件
+    listEl.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cat = btn.getAttribute('data-category');
+            selectedCategory = cat === '__all__' ? null : cat;
+            
+            if (pendingMode === 'dictionary') {
+                showDictionaryScreen();
+            } else {
+                startGame(pendingMode);
+            }
+        });
+    });
+}
+
+// --- 顯示單字圖鑑畫面 ---
+function showDictionaryScreen() {
+    hideAllScreens();
+    document.getElementById('dictionary-screen').style.display = 'flex';
+    
+    let listData = allVocabData;
+    if (selectedCategory) {
+        listData = allVocabData.filter(v => (v.category || '未分類') === selectedCategory);
+    }
+    
+    // 防呆
+    if (listData.length === 0) listData = [...allVocabData];
+    
+    const listEl = document.getElementById('dictionary-list');
+    let html = '';
+    
+    listData.forEach(v => {
+        html += `<div class="dict-card">
+            <span class="dict-word">${v.word}</span>
+            <span class="dict-trans">${v.translation}</span>
+        </div>`;
+    });
+    
+    listEl.innerHTML = html;
+}
+
 async function startGame(mode) {
     gameMode = mode || 'defense';
 
     // 初始化音效
     SFX.init();
     hideAllScreens();
-    
-    // 取得題庫
-    vocabList = await fetchVocab();
+
+    // 篩選題庫
+    if (allVocabData.length === 0) {
+        allVocabData = await fetchVocab();
+    }
+
+    if (selectedCategory) {
+        vocabList = allVocabData.filter(v => (v.category || '未分類') === selectedCategory);
+    } else {
+        vocabList = [...allVocabData];
+    }
+
+    // 防呆：篩選後題庫為空
+    if (vocabList.length === 0) {
+        vocabList = [...allVocabData];
+    }
 
     // 重置共用狀態
     gameState.score = 0;
@@ -1296,7 +1404,8 @@ async function startGame(mode) {
         practiceState.correctAttempts = 0;
         practiceState.usedIndices = [];
         updateHPDisplay();
-        scoreDisplay.innerText = '📖 練習';
+        const label = selectedCategory ? `📖 ${selectedCategory}` : '📖 練習';
+        scoreDisplay.innerText = label;
         spawnPracticeWord();
     } else {
         // 防禦模式初始化
@@ -1314,16 +1423,23 @@ async function startGame(mode) {
 // --- 初始化綁定 ---
 initKeyboard();
 
-// 模式選擇按鈕
-document.getElementById('start-defense-btn').addEventListener('click', () => startGame('defense'));
-document.getElementById('start-practice-btn').addEventListener('click', () => startGame('practice'));
+// 模式選擇 → 進入分類選擇畫面
+document.getElementById('start-defense-btn').addEventListener('click', () => showCategoryScreen('defense'));
+document.getElementById('start-practice-btn').addEventListener('click', () => showCategoryScreen('practice'));
+document.getElementById('start-dictionary-btn').addEventListener('click', () => showCategoryScreen('dictionary'));
+
+// 分類畫面返回
+document.getElementById('category-back-btn').addEventListener('click', showMainMenu);
+
+// 單字圖鑑返回分類畫面
+document.getElementById('dictionary-back-btn').addEventListener('click', () => showCategoryScreen('dictionary'));
 
 // 防禦模式結束畫面
-document.getElementById('restart-btn').addEventListener('click', () => startGame('defense'));
+document.getElementById('restart-btn').addEventListener('click', () => showCategoryScreen('defense'));
 document.getElementById('back-menu-btn').addEventListener('click', showMainMenu);
 
 // 練習模式結束畫面
-document.getElementById('practice-restart-btn').addEventListener('click', () => startGame('practice'));
+document.getElementById('practice-restart-btn').addEventListener('click', () => showCategoryScreen('practice'));
 document.getElementById('practice-menu-btn').addEventListener('click', showMainMenu);
 
 // 監聽 ESC 鍵 — 練習模式中按 ESC 結束練習
