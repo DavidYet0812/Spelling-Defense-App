@@ -1453,8 +1453,11 @@ function showDictionaryScreen() {
     const listEl = document.getElementById('dictionary-list');
     let html = '';
     
-    listData.forEach(v => {
+    listData.forEach((v, idx) => {
+        // 考慮資料庫欄位名稱可能為大寫或小寫，或者使用陣列索引
+        const idValue = v.id || v.ID || v.Id || (idx + 1);
         html += `<div class="dict-card">
+            <span class="dict-id">#${idValue}</span>
             <span class="dict-word">${v.word}</span>
             <span class="dict-trans">${v.translation}</span>
         </div>`;
