@@ -846,7 +846,8 @@ function initKeyboard() {
     const layout = [
         ['q','w','e','r','t','y','u','i','o','p'],
         ['a','s','d','f','g','h','j','k','l'],
-        ['z','x','c','v','b','n','m']
+        ['z','x','c','v','b','n','m'],
+        ['-',' ',"'"]
     ];
     
     layout.forEach(row => {
@@ -855,7 +856,11 @@ function initKeyboard() {
         row.forEach(key => {
             const btn = document.createElement('button');
             btn.className = 'key-btn';
-            btn.textContent = key;
+            btn.textContent = key === ' ' ? 'SPACE' : key;
+            if (key === ' ') {
+                btn.style.maxWidth = '150px';
+                btn.style.flex = '2';
+            }
             btn.setAttribute('data-key', key);
             
             // 觸控與點擊事件
@@ -869,10 +874,16 @@ function initKeyboard() {
 
     // 監聽實體鍵盤
     document.addEventListener('keydown', (e) => {
-        if (/^[a-zA-Z]$/.test(e.key)) {
-            handleInput(e.key.toLowerCase());
+        // 接受字母、空白、連字號、撇號
+        if (/^[a-zA-Z\s\-']$/.test(e.key)) {
+            // 防止按下空白鍵捲動網頁
+            if (e.key === ' ') e.preventDefault();
+            
+            const keyStr = e.key.toLowerCase();
+            handleInput(keyStr);
             // 讓虛擬按鍵閃爍一下
-            const btn = document.querySelector(`.key-btn[data-key="${e.key.toLowerCase()}"]`);
+            const btns = Array.from(document.querySelectorAll('.key-btn'));
+            const btn = btns.find(b => b.getAttribute('data-key') === keyStr);
             if (btn) {
                 btn.classList.add('active');
                 setTimeout(() => btn.classList.remove('active'), 100);
