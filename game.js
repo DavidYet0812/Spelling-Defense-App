@@ -1132,6 +1132,11 @@ function draw(timestamp) {
                 ? Math.round(practiceState.correctAttempts / practiceState.totalAttempts * 100)
                 : 100;
             ctx.fillText(`已完成: ${practiceState.completedCount}  |  正確率: ${acc}%`, centerX, wordY + 90);
+            
+            // 點擊發音提示
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.fillText("👆 點擊畫面聽取發音", centerX, wordY + 115);
         }
     } else {
         // === 防禦模式繪製 ===
@@ -1466,9 +1471,12 @@ function showDictionaryScreen() {
             }
         }
 
-        html += `<div class="dict-card">
+        // 處理單字字串，避免單引號造成 HTML 屬性錯誤
+        const safeWord = v.word.replace(/'/g, "\\'");
+        
+        html += `<div class="dict-card" onclick="speakText('${safeWord}')" style="cursor: pointer;" title="點擊聽發音">
             <span class="dict-id">#${idValue}</span>
-            <span class="dict-word">${v.word}</span>
+            <span class="dict-word">${v.word} 🔊</span>
             <span class="dict-trans">${v.translation}</span>
         </div>`;
     });
@@ -1571,5 +1579,28 @@ document.addEventListener('keydown', (e) => {
         endPractice();
     }
 });
+
+// 點擊 Canvas 朗讀當前單字（練習模式）
+canvas.addEventListener('click', () => {
+    if (gameState.isPlaying && gameMode === 'practice' && practiceState.currentWord) {
+        speakText(practiceState.currentWord.text);
+    }
+});
+canvas.addEventListener('touchstart', (e) => {
+    if (gameState.isPlaying && gameMode === 'practice' && practiceState.currentWord) {
+        speakText(practiceState.currentWord.text);
+    }
+});
+
+// ============================
+// --- 語音合成 (Text-to-Speech) ---
+// ============================
+function speakText(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
+}
 
 resizeCanvas(); // 初次載入預先校正
