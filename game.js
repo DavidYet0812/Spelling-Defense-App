@@ -1285,6 +1285,7 @@ function showMainMenu() {
     cancelAnimationFrame(gameLoopId);
     SFX.stopBGM();
     hideAllScreens();
+    document.getElementById('back-category-btn').style.display = 'none';
     document.getElementById('start-screen').style.display = 'flex';
     // 重置顯示
     hpDisplay.innerText = '❤️❤️❤️';
@@ -1296,6 +1297,7 @@ function gameOver() {
     cancelAnimationFrame(gameLoopId);
     SFX.playGameOver();
     SFX.stopBGM();
+    document.getElementById('back-category-btn').style.display = 'none';
     document.getElementById('final-score').innerText = gameState.score;
     document.getElementById('game-over-screen').style.display = 'flex';
     
@@ -1308,6 +1310,7 @@ function endPractice() {
     gameState.isPlaying = false;
     cancelAnimationFrame(gameLoopId);
     SFX.stopBGM();
+    document.getElementById('back-category-btn').style.display = 'none';
 
     const acc = practiceState.totalAttempts > 0
         ? Math.round(practiceState.correctAttempts / practiceState.totalAttempts * 100)
@@ -1411,6 +1414,20 @@ function showBatchScreen() {
     const listEl = document.getElementById('batch-list');
     let html = '';
     
+    // 如果不是全部單字，顯示自訂範圍輸入
+    if (selectedCategory && listData.length > 0) {
+        html += `
+        <div style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+            <div style="color: #fff; font-size: 0.9rem; margin-bottom: 8px;">自訂題數範圍 (1 ~ ${listData.length})</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <input type="number" id="custom-range-start" min="1" max="${listData.length}" value="1" style="width: 50px; text-align: center; border-radius: 4px; border: none; padding: 4px; font-size: 0.9rem;">
+                <span style="color: #ccc;">到</span>
+                <input type="number" id="custom-range-end" min="1" max="${listData.length}" value="${Math.min(20, listData.length)}" style="width: 50px; text-align: center; border-radius: 4px; border: none; padding: 4px; font-size: 0.9rem;">
+                <button id="custom-range-btn" style="padding: 4px 10px; font-size: 0.9rem; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">開始</button>
+            </div>
+        </div>`;
+    }
+
     const BATCH_SIZE = 10;
     const totalBatches = Math.ceil(listData.length / BATCH_SIZE);
 
@@ -1432,12 +1449,30 @@ function showBatchScreen() {
     
     listEl.innerHTML = html;
 
+    // 綁定自訂範圍按鈕
+    const customBtn = document.getElementById('custom-range-btn');
+    if (customBtn) {
+        customBtn.addEventListener('click', () => {
+            let start = parseInt(document.getElementById('custom-range-start').value);
+            let end = parseInt(document.getElementById('custom-range-end').value);
+            if (isNaN(start) || start < 1) start = 1;
+            if (isNaN(end) || end > listData.length) end = listData.length;
+            if (start > end) {
+                let temp = start; start = end; end = temp;
+            }
+            selectedBatchRange = { start: start - 1, end: end };
+            startGame('practice');
+        });
+    }
+
     listEl.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const start = parseInt(btn.getAttribute('data-start'));
-            const end = parseInt(btn.getAttribute('data-end'));
-            selectedBatchRange = { start, end };
-            startGame('practice');
+            if (btn.hasAttribute('data-start')) {
+                const start = parseInt(btn.getAttribute('data-start'));
+                const end = parseInt(btn.getAttribute('data-end'));
+                selectedBatchRange = { start, end };
+                startGame('practice');
+            }
         });
     });
 }
@@ -1534,12 +1569,14 @@ async function startGame(mode) {
         updateHPDisplay();
         const label = selectedCategory ? `📖 ${selectedCategory}` : '📖 練習';
         scoreDisplay.innerText = label;
+        document.getElementById('back-category-btn').style.display = 'flex';
         spawnPracticeWord();
     } else {
         // 防禦模式初始化
         gameState.hp = 3;
         updateHPDisplay();
         scoreDisplay.innerText = '0';
+        document.getElementById('back-category-btn').style.display = 'none';
     }
 
     resizeCanvas();
@@ -1550,6 +1587,15 @@ async function startGame(mode) {
 
 // --- 初始化綁定 ---
 initKeyboard();
+
+// 遊戲中返回分類按鈕
+document.getElementById('back-category-btn').addEventListener('click', () => {
+    gameState.isPlaying = false;
+    cancelAnimationFrame(gameLoopId);
+    SFX.stopBGM();
+    document.getElementById('back-category-btn').style.display = 'none';
+    showCategoryScreen('practice');
+});
 
 // 模式選擇 → 進入分類選擇畫面
 document.getElementById('start-defense-btn').addEventListener('click', () => showCategoryScreen('defense'));
