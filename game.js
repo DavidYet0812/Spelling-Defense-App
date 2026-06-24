@@ -1494,9 +1494,8 @@ function showDictionaryScreen() {
     let html = '';
     
     listData.forEach((v, idx) => {
-        // 優化：有時資料庫的第一個欄位（ID）在表頭可能只標記為數字、或是空白名稱
-        // 這裡自動抓取物件中的第一個屬性，只要它不叫 word 也不叫 translation，就視作 ID
-        let idValue = v.id || v.ID || v.Id;
+        // 分類檢視從該分類的第 1 筆重新編號；全部單字保留資料庫原始 ID。
+        let idValue = selectedCategory ? idx + 1 : (v.id || v.ID || v.Id);
         if (!idValue) {
             const firstKey = Object.keys(v)[0];
             if (firstKey && firstKey.toLowerCase() !== 'word' && firstKey.toLowerCase() !== 'translation') {
